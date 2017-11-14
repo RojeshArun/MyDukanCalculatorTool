@@ -1,0 +1,23 @@
+<resources>
+    <!-- Base application theme. -->
+
+    <style name="CustomMaterialTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Parent theme for all pre lolipop & lolipop versions ( All devices) -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="colorControlHighlight">#939114</item>
+        <item name="colorButtonNormal">@color/colorPrimaryDark</item>
+        <item name="colorControlActivated">#28d10a</item>
+    </style>
+
+
+    <style name="AppMaterialTheme" parent="CustomMaterialTheme">
+        <!-- Customize your theme here. -->
+
+
+    </style>
+
+
+</resources>

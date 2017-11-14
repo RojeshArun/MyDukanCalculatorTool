@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="5dp"
+        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/txt_scheme_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_alignTop="@+id/chk_scheme"
+        android:layout_alignBottom="@+id/chk_scheme"
+        android:layout_toLeftOf="@+id/chk_scheme"
+        android:text="Scheme 1" />
+
+    <CheckBox
+        android:id="@+id/chk_scheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:padding="5dp" />
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
