@@ -1,6 +1,5 @@
-package calc.mydukan.com.calculatortool.adapters;
+package calc.mydukan.com.calculatortool.fragments.allschemes.adapter;
 
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,28 +12,27 @@ import java.util.List;
 
 import calc.mydukan.com.calculatortool.Helper.SchemeHelper;
 import calc.mydukan.com.calculatortool.R;
-import calc.mydukan.com.calculatortool.fragments.allschemes.adapter.MySchemesAdapter;
+import calc.mydukan.com.calculatortool.adapters.BrandsAdapter;
 import calc.mydukan.com.calculatortool.models.Schemes;
 
 /**
  * Created by rojesharunkumar on 20/10/17.
  */
 
-public class SchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MySchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     List<Schemes> schemeList;
-    private SchemesAdapter.ISchemessItemHolderClick onClick;
 
-    public SchemesAdapter(Fragment frag) {
+    public MySchemesAdapter() {
         schemeList = SchemeHelper.getInstance().getSchemeList();
-        onClick = (ISchemessItemHolderClick) frag;
     }
+
 
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).
-                inflate(R.layout.scheme_item, parent, false);
+                inflate(R.layout.my_scheme_item, parent, false);
         return new SchemeViewHolder(view);
     }
 
@@ -44,13 +42,6 @@ public class SchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Schemes scheme = schemeList.get(position);
 
         schemeViewHolder.txtTitle.setText(scheme.getSchemeName());
-        schemeViewHolder.chkScheme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                SchemeHelper.getInstance().setChecked(isChecked, position);
-                onClick.onItemClick(position);
-            }
-        });
 
 
     }
@@ -73,17 +64,11 @@ public class SchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public static class SchemeViewHolder extends RecyclerView.ViewHolder {
         TextView txtTitle;
-        CheckBox chkScheme;
 
         public SchemeViewHolder(View itemView) {
             super(itemView);
             txtTitle = itemView.findViewById(R.id.txt_scheme_title);
-            chkScheme = itemView.findViewById(R.id.chk_scheme);
 
         }
-    }
-
-    public interface ISchemessItemHolderClick {
-        void onItemClick(int pos);
     }
 }

@@ -50,4 +50,9 @@ public class MySelectedSchemesHelper {
     public Brands getCurrentBrand() {
         return myCurrentBrand;
     }
+
+    public void reset() {
+        mySelectedList = new ArrayList<>();
+        myCurrentBrand = null;
+    }
 }

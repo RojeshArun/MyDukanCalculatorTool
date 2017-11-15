@@ -1,5 +1,6 @@
 package calc.mydukan.com.calculatortool.adapters;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import calc.mydukan.com.calculatortool.R;
-import calc.mydukan.com.calculatortool.fragments.AllSchemesFragments;
+import calc.mydukan.com.calculatortool.fragments.allschemes.AllBrandsFragments;
+import calc.mydukan.com.calculatortool.fragments.myselectedschemes.MyBrandsFragments;
 import calc.mydukan.com.calculatortool.models.Brands;
 
 /**
@@ -23,9 +25,13 @@ public class BrandsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private IBrandsItemHolderClick onClick;
 
 
-    public BrandsAdapter(AllSchemesFragments allSchemesFragments) {
+    public BrandsAdapter(Fragment allSchemesFragments) {
         brandsList = new ArrayList<>();
-        onClick = allSchemesFragments;
+        if(allSchemesFragments instanceof AllBrandsFragments) {
+            onClick = (IBrandsItemHolderClick) allSchemesFragments;
+        }else{
+            onClick = (MyBrandsFragments) allSchemesFragments;
+        }
     }
 
     public interface IBrandsItemHolderClick {

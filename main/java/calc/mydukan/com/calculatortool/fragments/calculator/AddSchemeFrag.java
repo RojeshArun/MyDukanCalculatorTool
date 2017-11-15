@@ -1,4 +1,4 @@
-package calc.mydukan.com.calculatortool.fragments;
+package calc.mydukan.com.calculatortool.fragments.calculator;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,15 +28,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import calc.mydukan.com.calculatortool.Helper.DeviceHelper;
 import calc.mydukan.com.calculatortool.MainActivity;
 import calc.mydukan.com.calculatortool.R;
-import calc.mydukan.com.calculatortool.Utils.NetworkUtils;
 import calc.mydukan.com.calculatortool.models.Device;
 import calc.mydukan.com.calculatortool.models.Model;
 
@@ -48,15 +45,14 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
         AdapterView.OnItemSelectedListener, View.OnClickListener {
 
 
-    AutoCompleteTextView mCalulatedScheme, mSelectedScheme;
     private AppCompatSpinner spnrModles;
-    // float[] dealPrice = {0, 6999, 7999, 8999, 11999, 14999, 20999, 18999, 4999};
-    String[] models = {"--Select Model--"};
-    private AutoCompleteTextView mTxtDelarPrice, mEdtQuantity, mEdtTarget, mEdtValue;
+    String[] models = {"- Select Model -"};
+    private AutoCompleteTextView mTxtDelarPrice, mEdtQuantity, mEdtTarget, mEdtValue, mCalulatedScheme, mSelectedScheme;
     private RadioGroup mRg, mRgScheme;
     private float mdealPrice = 0.0f;
     private Button btnAdd;
     private MainActivity mMainActivity;
+    private ValueEventListener modelListener;
 
     private DatabaseReference modelRef;
     private String brandId, brandName;
@@ -156,12 +152,12 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
     private void fetchModelData() {
         modelRef = FirebaseDatabase.getInstance().getReference("models").child(brandId);
         modelsArrayList = new ArrayList<>();
-        modelRef.addValueEventListener(new ValueEventListener() {
+        modelListener = modelRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int i = 0;
                 models = new String[Integer.parseInt(dataSnapshot.getChildrenCount() + "") + 1];
-                models[0] = "-Select Model-";
+                models[0] = "- Select Model -";
                 i++;
                 for (DataSnapshot modelsList : dataSnapshot.getChildren()) {
                     Model brandItem = modelsList.getValue(Model.class);
@@ -207,10 +203,10 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
                 return false;
             }
         });
-        mEdtValue.addTextChangedListener(new TextWatcher() {
+        mEdtQuantity.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                calculateValue();
+
             }
 
             @Override
@@ -220,7 +216,7 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+                calculateValue();
             }
         });
         mSelectedScheme = view.findViewById(R.id.edt_selected_scheme);
@@ -233,6 +229,22 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
                     calulateScheme();
                 }
                 return false;
+            }
+        });
+        mSelectedScheme.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                calulateScheme();
             }
         });
 
@@ -248,6 +260,8 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
             Float res = Float.parseFloat(mEdtQuantity.getText().toString())
                     * Float.parseFloat(mTxtDelarPrice.getText().toString());
             mEdtValue.setText(res + "");
+        } else {
+            mEdtValue.setText(0 + "");
         }
 
     }
@@ -295,12 +309,16 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
                     && !TextUtils.isEmpty(mSelectedScheme.getText().toString())) {
                 incentiveAmount = Float.parseFloat(mEdtQuantity.getText().toString().trim())
                         * Float.parseFloat(mSelectedScheme.getText().toString());
+            } else {
+                incentiveAmount = 0.0f;
             }
         } else {
             if (!TextUtils.isEmpty(mEdtValue.getText().toString().trim())
                     && !TextUtils.isEmpty(mSelectedScheme.getText().toString())) {
 
                 incentiveAmount = Float.parseFloat(mEdtValue.getText().toString()) * Float.parseFloat(mSelectedScheme.getText().toString()) / 100;
+            } else {
+                incentiveAmount = 0.0f;
             }
         }
 
@@ -349,7 +367,11 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
 
     @Override
     public void onClick(View view) {
-        addModel();
+        switch (view.getId()) {
+            case R.id.btn_add:
+                addModel();
+                break;
+        }
 
 
     }
@@ -362,7 +384,7 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
         } else if (TextUtils.isEmpty(mEdtQuantity.getText().toString())) {
             mEdtQuantity.setError("Enter quantity");
         } else if (TextUtils.isEmpty(mSelectedScheme.getText().toString())) {
-            mSelectedScheme.setError("Enter perhandset value/%");
+            mSelectedScheme.setError("Enter per handset value / %");
         } else {
             Device device = new Device();
             device.setModel(spnrModles.getSelectedItem().toString().trim());
@@ -384,5 +406,11 @@ public class AddSchemeFrag extends Fragment implements RadioGroup.OnCheckedChang
         mMainActivity.clearCurrentFragment();
         mMainActivity.notifyListDataChanged();
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        modelRef.removeEventListener(modelListener);
     }
 }

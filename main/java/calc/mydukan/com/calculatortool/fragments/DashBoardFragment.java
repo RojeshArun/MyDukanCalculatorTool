@@ -17,6 +17,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import calc.mydukan.com.calculatortool.MainActivity;
 import calc.mydukan.com.calculatortool.R;
+import calc.mydukan.com.calculatortool.fragments.allschemes.AllBrandsFragments;
+import calc.mydukan.com.calculatortool.fragments.calculator.CalculatorForm;
+import calc.mydukan.com.calculatortool.fragments.myselectedschemes.MyBrandsFragments;
 
 /**
  * Created by rojesharunkumar on 06/11/17.
@@ -109,6 +112,7 @@ public class DashBoardFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
+        mActivity.clearStack();
 
         switch (view.getId()) {
             case R.id.btn_calculator:
@@ -128,6 +132,7 @@ public class DashBoardFragment extends Fragment implements View.OnClickListener 
         }
     }
 
+
     private void loadMyEarnings() {
         fragment = EarningsFragments.newInstance();
         mActivity.addFragment(fragment, true);
@@ -135,12 +140,12 @@ public class DashBoardFragment extends Fragment implements View.OnClickListener 
     }
 
     private void loadMySchemesFragment() {
-        fragment = MySchemesFragments.newInstance();
+        fragment = MyBrandsFragments.newInstance();
         mActivity.addFragment(fragment, true);
     }
 
     private void loadSchemesFragment() {
-        fragment = AllSchemesFragments.newInstance();
+        fragment = AllBrandsFragments.newInstance();
         mActivity.addFragment(fragment, true);
 
     }

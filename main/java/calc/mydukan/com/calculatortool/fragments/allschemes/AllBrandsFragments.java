@@ -1,7 +1,8 @@
-package calc.mydukan.com.calculatortool.fragments;
+package calc.mydukan.com.calculatortool.fragments.allschemes;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,8 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,19 +27,21 @@ import java.util.List;
 import calc.mydukan.com.calculatortool.Helper.MySelectedSchemesHelper;
 import calc.mydukan.com.calculatortool.MainActivity;
 import calc.mydukan.com.calculatortool.R;
+import calc.mydukan.com.calculatortool.Utils.FireBaseUtils;
 import calc.mydukan.com.calculatortool.Utils.Utils;
 import calc.mydukan.com.calculatortool.adapters.BrandsAdapter;
 import calc.mydukan.com.calculatortool.adapters.GridSpacingItemDecoration;
 import calc.mydukan.com.calculatortool.models.Brands;
+import calc.mydukan.com.calculatortool.models.MySelectedModel;
 
 /**
  * Created by rojesharunkumar on 06/11/17.
  */
 
-public class AllSchemesFragments extends Fragment implements
+public class AllBrandsFragments extends Fragment implements
         BrandsAdapter.IBrandsItemHolderClick, View.OnClickListener {
 
-    private DatabaseReference brandsRef;
+    private DatabaseReference brandsRef, mySchemesRef;
     private RecyclerView mBrandsRecycleView;
     private MainActivity mActivity;
     private BrandsAdapter mAdapter;
@@ -44,10 +49,10 @@ public class AllSchemesFragments extends Fragment implements
     private Button btnAdd;
 
 
-    public static AllSchemesFragments newInstance() {
+    public static AllBrandsFragments newInstance() {
 
         Bundle args = new Bundle();
-        AllSchemesFragments fragment = new AllSchemesFragments();
+        AllBrandsFragments fragment = new AllBrandsFragments();
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,6 +68,9 @@ public class AllSchemesFragments extends Fragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         brandsRef = FirebaseDatabase.getInstance().getReference("brands");
+        mySchemesRef = FirebaseDatabase.getInstance()
+                .getReferenceFromUrl("https://otsystem-64e61.firebaseio.com/MySchemes/"
+                        + FireBaseUtils.getUid());
     }
 
     @Override
@@ -74,21 +82,25 @@ public class AllSchemesFragments extends Fragment implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Brands brandItem;
+                if (mActivity != null) {
 
-                for (DataSnapshot brand : dataSnapshot.getChildren()
-                        ) {
-                    brandItem = brand.getValue(Brands.class);
-                    mBrandsList.add(brandItem);
+                    for (DataSnapshot brand : dataSnapshot.getChildren()
+                            ) {
+                        brandItem = brand.getValue(Brands.class);
+                        mBrandsList.add(brandItem);
+                    }
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged(mBrandsList);
+                    }
+                    mActivity.hideProgressBar();
                 }
-                if (mAdapter != null) {
-                    mAdapter.notifyDataSetChanged(mBrandsList);
-                }
-                mActivity.hideProgressBar();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                mActivity.hideProgressBar();
+                if (mActivity != null) {
+                    mActivity.hideProgressBar();
+                }
             }
         });
     }
@@ -102,10 +114,8 @@ public class AllSchemesFragments extends Fragment implements
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         mBrandsRecycleView = view.findViewById(R.id.lst_schemes);
-        btnAdd = view.findViewById(R.id.btn_add);
-        btnAdd.setText("Add to My Schemes");
-        btnAdd.setOnClickListener(this);
         GridLayoutManager layoutManager = new GridLayoutManager(mActivity, 2);
         mAdapter = new BrandsAdapter(this);
         mBrandsRecycleView.setLayoutManager(layoutManager);
@@ -114,6 +124,10 @@ public class AllSchemesFragments extends Fragment implements
         mBrandsRecycleView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged(mBrandsList);
 
+        btnAdd = view.findViewById(R.id.btn_add);
+        btnAdd.setText("Add to My Schemes");
+        btnAdd.setOnClickListener(this);
+        btnAdd.setVisibility(View.VISIBLE);
     }
 
 
@@ -140,8 +154,33 @@ public class AllSchemesFragments extends Fragment implements
     }
 
     private void AddToMySchemes() {
-        MySelectedSchemesHelper.getInstance().getList();
+        if (MySelectedSchemesHelper.getInstance().getList() != null && MySelectedSchemesHelper.getInstance().getList().size() > 0) {
+            MySelectedModel selectedModel = new MySelectedModel(FireBaseUtils.getUid(), MySelectedSchemesHelper.getInstance().getList());
+            mySchemesRef.setValue(selectedModel)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(mActivity, "Success", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(mActivity, "Failed to add", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(mActivity, "Please add schemes", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mActivity != null) {
+            MySelectedSchemesHelper.getInstance().reset();
+            mActivity.hideProgressBar();
+        }
+    }
 }

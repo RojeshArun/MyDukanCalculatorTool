@@ -21,6 +21,6 @@
         android:padding="5dp"
         android:text="Add to My Schemes"
         android:textColor="@android:color/white"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 </RelativeLayout>

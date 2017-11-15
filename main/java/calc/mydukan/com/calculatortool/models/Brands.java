@@ -1,12 +1,13 @@
 package calc.mydukan.com.calculatortool.models;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by rojesharunkumar on 05/11/17.
  */
 
-public class Brands {
+public class Brands implements Serializable {
     String brandId;
     String brandTitle;
 

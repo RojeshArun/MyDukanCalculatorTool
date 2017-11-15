@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import calc.mydukan.com.calculatortool.fragments.CalculatorForm;
+import calc.mydukan.com.calculatortool.fragments.calculator.CalculatorForm;
 import calc.mydukan.com.calculatortool.fragments.DashBoardFragment;
 
 public class MainActivity extends AppCompatActivity implements
@@ -90,6 +90,13 @@ public class MainActivity extends AppCompatActivity implements
         fragment = fragmentManager.findFragmentById(R.id.container);
         if (fragment != null && fragment instanceof  CalculatorForm) {
             ((CalculatorForm) fragment).notifyData();
+        }
+    }
+
+    public void clearStack() {
+        int stackCount = fragmentManager.getBackStackEntryCount();
+        for(int i =0;i<stackCount;i++){
+            fragmentManager.popBackStack();
         }
     }
 }

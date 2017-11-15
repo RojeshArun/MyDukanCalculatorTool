@@ -1,4 +1,4 @@
-package calc.mydukan.com.calculatortool.fragments;
+package calc.mydukan.com.calculatortool.fragments.calculator;
 
 import android.content.Context;
 import android.net.Uri;
@@ -30,12 +30,15 @@ import java.util.List;
 import calc.mydukan.com.calculatortool.Helper.DeviceHelper;
 import calc.mydukan.com.calculatortool.MainActivity;
 import calc.mydukan.com.calculatortool.R;
+import calc.mydukan.com.calculatortool.Utils.FireBaseUtils;
 import calc.mydukan.com.calculatortool.Utils.NetworkUtils;
 import calc.mydukan.com.calculatortool.Utils.Utils;
 import calc.mydukan.com.calculatortool.adapters.AddedModelsAdapter;
 import calc.mydukan.com.calculatortool.adapters.GridSpacingItemDecoration;
+import calc.mydukan.com.calculatortool.fragments.PdfFragment;
 import calc.mydukan.com.calculatortool.models.Brands;
 import calc.mydukan.com.calculatortool.models.Device;
+import calc.mydukan.com.calculatortool.models.MySelectedModel;
 import calc.mydukan.com.calculatortool.models.Schemes;
 
 
@@ -46,12 +49,13 @@ public class CalculatorForm extends Fragment
     private MainActivity mActivity;
     AppCompatSpinner spnrBrands, spnrSchemes, sprnMonth;
     private DatabaseReference databaseReference;
+    private ValueEventListener brandsListener;
 
     String[] brand = {"- Select Brand -"};
     List<Brands> brandArrayList;
     List<Schemes> schemesArrayList;
 
-    String[] schemes = {"-Select Scheme-", "Scheme 1", "Scheme 2 ", "Scheme 3", "Scheme 4", "Scheme 5 ", "Scheme 6"};
+    String[] schemes = {"- Select Scheme -"};
 
     private TextView mTxtOfferDater, mTxtCalculator;
 
@@ -99,8 +103,9 @@ public class CalculatorForm extends Fragment
     }
 
     private void setFirebase() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("brands");
-        // setTempData();
+        databaseReference = FirebaseDatabase.getInstance()
+                .getReferenceFromUrl("https://otsystem-64e61.firebaseio.com/MySchemes/" + FireBaseUtils.getUid());
+//addTempData();
         if (NetworkUtils.isNetworkConnected(getActivity())) {
             getMobileBrands();
         } else {
@@ -112,26 +117,34 @@ public class CalculatorForm extends Fragment
     }
 
     private void getMobileBrands() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        brandsListener= databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                int i = 0;
-                brand = new String[Integer.parseInt(dataSnapshot.getChildrenCount() + "") + 1];
-                brand[0] = "- Select Brand -";
-                i++;
-                for (DataSnapshot brandsList : dataSnapshot.getChildren()) {
-                    Brands brandItem = brandsList.getValue(Brands.class);
-                    brandArrayList.add(brandItem);
-                    brand[i] = brandItem.getBrandTitle();
+                if (mActivity != null && dataSnapshot.getValue() != null) {
+                    int i = 0;
+                    MySelectedModel mySelectedModel = dataSnapshot.getValue(MySelectedModel.class);
+                    brandArrayList = mySelectedModel.getMySelectedSchemes();
+                    brand = new String[brandArrayList.size() + 1];
+                    brand[0] = "- Select Brand -";
                     i++;
+
+                    for (Brands brandItem : brandArrayList) {
+                        brand[i] = brandItem.getBrandTitle();
+                        i++;
+                    }
+                    setBrandSpinner();
+                    mActivity.hideProgressBar();
+                }else{
+                    Toast.makeText(mActivity, "Please add schemes", Toast.LENGTH_SHORT).show();
+                    mActivity.clearStack();
                 }
-                setBrandSpinner();
-                mActivity.hideProgressBar();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                mActivity.hideProgressBar();
+                if (mActivity != null) {
+                    mActivity.hideProgressBar();
+                }
             }
         });
     }
@@ -262,7 +275,7 @@ public class CalculatorForm extends Fragment
     }
 
     private void setBrandSpinner() {
-        if(brand !=  null) {
+        if (getActivity() != null && brand != null) {
             ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(),
                     android.R.layout.simple_spinner_item, brand);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -310,7 +323,7 @@ public class CalculatorForm extends Fragment
                 if (i != 0) {
                     showDatePickerOnUi();
                     // TODO Schemes
-                    loadSchemes(brand[i]);
+                    loadSchemes(i-1);
                 } else {
                     reset();
                 }
@@ -331,34 +344,51 @@ public class CalculatorForm extends Fragment
 
     }
 
-    private void loadSchemes(String selectedItemName) {
-        String brandId = getBrandId(selectedItemName);
+    private void loadSchemes(int pos) {
+        Brands selectedBrand = brandArrayList.get(pos);
+        schemesArrayList = new ArrayList<>();
+        schemesArrayList = selectedBrand.getMySelectedSchemesList();
+        schemes = new String[schemesArrayList.size() + 1];
+        int i = 1;
+        schemes[0] = "- Select Schemes -";
+        for (Schemes schemeItem : schemesArrayList) {
+            schemes[i] = schemeItem.getSchemeName();
+            i++;
+            setSchemeSpinner();
+        }
+
+/*
+
         DatabaseReference schemesRef = FirebaseDatabase.getInstance().getReference("schemes").child(brandId);
 
         schemesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                schemes = new String[Integer.parseInt(dataSnapshot.getChildrenCount() + "") + 1];
-                schemesArrayList = new ArrayList<>();
-                int i = 1;
-                schemes[0] = "-Select Schemes-";
-                for (DataSnapshot schemeSS : dataSnapshot.getChildren()) {
-                    Schemes schemesItem = schemeSS.getValue(Schemes.class);
-                    schemesArrayList.add(schemesItem);
-                    schemes[i] = schemesItem.getSchemeName();
-                    i++;
-                    setSchemeSpinner();
-                }
+                if (mActivity != null & isAdded()) {
+                    schemes = new String[Integer.parseInt(dataSnapshot.getChildrenCount() + "") + 1];
+                    int i = 1;
+                    schemes[0] = "- Select Schemes -";
+                    for (DataSnapshot schemeSS : dataSnapshot.getChildren()) {
+                        Schemes schemesItem = schemeSS.getValue(Schemes.class);
+                        schemesArrayList.add(schemesItem);
+                        schemes[i] = schemesItem.getSchemeName();
+                        i++;
+                        setSchemeSpinner();
+                    }
 
-                mActivity.hideProgressBar();
+                    mActivity.hideProgressBar();
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                mActivity.hideProgressBar();
+                if (mActivity != null) {
+                    mActivity.hideProgressBar();
+                }
             }
         });
 
+*/
     }
 
     private void setSchemeSpinner() {
@@ -459,6 +489,15 @@ public class CalculatorForm extends Fragment
                 btnGetSummary.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);
             }
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mActivity != null) {
+            databaseReference.removeEventListener(brandsListener);
+            mActivity.hideProgressBar();
         }
     }
 }

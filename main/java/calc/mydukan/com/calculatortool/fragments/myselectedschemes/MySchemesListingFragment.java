@@ -1,4 +1,4 @@
-package calc.mydukan.com.calculatortool.fragments;
+package calc.mydukan.com.calculatortool.fragments.myselectedschemes;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,25 +12,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import calc.mydukan.com.calculatortool.Helper.MySelectedSchemesHelper;
 import calc.mydukan.com.calculatortool.Helper.SchemeHelper;
 import calc.mydukan.com.calculatortool.MainActivity;
 import calc.mydukan.com.calculatortool.R;
-import calc.mydukan.com.calculatortool.Utils.FireBaseUtils;
 import calc.mydukan.com.calculatortool.Utils.Utils;
 import calc.mydukan.com.calculatortool.adapters.GridSpacingItemDecoration;
-import calc.mydukan.com.calculatortool.adapters.SchemesAdapter;
+import calc.mydukan.com.calculatortool.fragments.allschemes.adapter.MySchemesAdapter;
 import calc.mydukan.com.calculatortool.models.Brands;
 import calc.mydukan.com.calculatortool.models.Schemes;
 
@@ -38,24 +30,22 @@ import calc.mydukan.com.calculatortool.models.Schemes;
  * Created by rojesharunkumar on 06/11/17.
  */
 
-public class SchemesListingFragment extends Fragment
+public class MySchemesListingFragment extends Fragment
         implements AdapterView.OnItemClickListener, View.OnClickListener {
 
-    private DatabaseReference brandsRef;
     private RecyclerView mBrandsRecycleView;
     private MainActivity mActivity;
-    private SchemesAdapter mAdapter;
+    private MySchemesAdapter mAdapter;
     private List<Schemes> mSchemesList;
-    private String brandId;
+    private Brands currentBrand;
     private Button btnAdd;
-    FirebaseUser user;
 
 
-    public static SchemesListingFragment newInstance(String brandId) {
+    public static MySchemesListingFragment newInstance(Brands brand) {
 
         Bundle args = new Bundle();
-        args.putString("brand_id", brandId);
-        SchemesListingFragment fragment = new SchemesListingFragment();
+        args.putSerializable("brand", brand);
+        MySchemesListingFragment fragment = new MySchemesListingFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,40 +62,9 @@ public class SchemesListingFragment extends Fragment
         super.onCreate(savedInstanceState);
         mActivity.showProgressBar();
         if (getArguments() != null) {
-            brandId = getArguments().getString("brand_id");
+            currentBrand = (Brands) getArguments().getSerializable("brand");
+            mSchemesList = currentBrand.getMySelectedSchemesList();
         }
-        brandsRef = FirebaseDatabase.getInstance().getReference("schemes").child(brandId);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mSchemesList = new ArrayList<>();
-        SchemeHelper.getInstance().resetScheme();
-        brandsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Schemes brandItem;
-
-                for (DataSnapshot brand : dataSnapshot.getChildren()
-                        ) {
-                    brandItem = brand.getValue(Schemes.class);
-                    mSchemesList.add(brandItem);
-                }
-                if (mAdapter != null) {
-                    mAdapter.notifyDataSetChanged(mSchemesList);
-                }
-                mActivity.hideProgressBar();
-                if (btnAdd != null) {
-                    btnAdd.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                mActivity.hideProgressBar();
-            }
-        });
     }
 
     @Nullable
@@ -122,7 +81,7 @@ public class SchemesListingFragment extends Fragment
         btnAdd.setOnClickListener(this);
         mBrandsRecycleView = view.findViewById(R.id.lst_schemes);
         GridLayoutManager layoutManager = new GridLayoutManager(mActivity, 2);
-        mAdapter = new SchemesAdapter();
+        mAdapter = new MySchemesAdapter();
         mBrandsRecycleView.setLayoutManager(layoutManager);
         mBrandsRecycleView.addItemDecoration(
                 new GridSpacingItemDecoration(2, Utils.dpToPx(getActivity(), 10), true));
@@ -131,7 +90,7 @@ public class SchemesListingFragment extends Fragment
             mAdapter.notifyDataSetChanged(mSchemesList);
         }
 
-
+        mActivity.hideProgressBar();
     }
 
 
