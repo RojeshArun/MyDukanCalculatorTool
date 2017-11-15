@@ -65,6 +65,7 @@ public class SchemeHelper {
         } else {
             mySelectedList.remove(schemeList.get(position));
         }
+
     }
 
     public void updateList(List<Schemes> mSchemesList) {

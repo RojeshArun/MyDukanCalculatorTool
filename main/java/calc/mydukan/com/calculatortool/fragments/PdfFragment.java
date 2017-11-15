@@ -1,46 +1,23 @@
 package calc.mydukan.com.calculatortool.fragments;
 
-import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.List;
 
-import calc.mydukan.com.calculatortool.Helper.DeviceHelper;
 import calc.mydukan.com.calculatortool.R;
-import calc.mydukan.com.calculatortool.Utils.Utils;
 import calc.mydukan.com.calculatortool.adapters.DevicesAdapter;
-import calc.mydukan.com.calculatortool.adapters.GridSpacingItemDecoration;
-import calc.mydukan.com.calculatortool.models.Device;
 
 /**
  * Created by rojesharunkumar on 09/11/17.
@@ -80,7 +57,7 @@ public class PdfFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnShare = view.findViewById(R.id.btn_share);
+       /* btnShare = view.findViewById(R.id.btn_share);
         btnShare.setOnClickListener(this);
 
         btnEmail = view.findViewById(R.id.btn_email);
@@ -100,10 +77,11 @@ public class PdfFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         } catch (DocumentException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
+/*
     private void checkPermission() throws FileNotFoundException, DocumentException {
         int hasStoragePermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (hasStoragePermission != PackageManager.PERMISSION_GRANTED) {
@@ -210,6 +188,7 @@ public class PdfFragment extends Fragment implements View.OnClickListener {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+*/
 
     @Override
     public void onClick(View view) {

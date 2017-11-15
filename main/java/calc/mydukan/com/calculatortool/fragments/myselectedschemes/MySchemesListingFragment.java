@@ -7,22 +7,22 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 
-import com.google.firebase.database.DatabaseReference;
-
 import java.util.List;
 
-import calc.mydukan.com.calculatortool.Helper.MySelectedSchemesHelper;
-import calc.mydukan.com.calculatortool.Helper.SchemeHelper;
 import calc.mydukan.com.calculatortool.MainActivity;
 import calc.mydukan.com.calculatortool.R;
 import calc.mydukan.com.calculatortool.Utils.Utils;
 import calc.mydukan.com.calculatortool.adapters.GridSpacingItemDecoration;
 import calc.mydukan.com.calculatortool.fragments.allschemes.adapter.MySchemesAdapter;
+import calc.mydukan.com.calculatortool.fragments.calculator.AddSchemeFrag;
 import calc.mydukan.com.calculatortool.models.Brands;
 import calc.mydukan.com.calculatortool.models.Schemes;
 
@@ -60,6 +60,7 @@ public class MySchemesListingFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         mActivity.showProgressBar();
         if (getArguments() != null) {
             currentBrand = (Brands) getArguments().getSerializable("brand");
@@ -111,16 +112,25 @@ public class MySchemesListingFragment extends Fragment
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add:
-                saveMySelectedSchemes();
+              //  saveMySelectedSchemes();
                 break;
         }
     }
 
-    private void saveMySelectedSchemes() {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.top_menu,menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-        List<Schemes> updatedScheme = SchemeHelper.getInstance().getMySelectedList();
-        MySelectedSchemesHelper.getInstance().updateBrand(updatedScheme);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        gotoAddSchemeFragment();
+        return super.onOptionsItemSelected(item);
 
     }
 
+    private void gotoAddSchemeFragment() {
+      //  AddSchemeFrag frag =AddSchemeFrag.newInstance();
+    }
 }

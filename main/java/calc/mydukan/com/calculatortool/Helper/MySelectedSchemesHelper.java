@@ -41,18 +41,50 @@ public class MySelectedSchemesHelper {
     }
 
     public void addBrand(Brands selectedBrand) {
-        if (!mySelectedList.contains(selectedBrand)) {
+
+        if (!checkIsMyBrandAdded(selectedBrand)) {
             myCurrentBrand = selectedBrand;
             mySelectedList.add(selectedBrand);
         }
     }
 
-    public void updateBrand(List<Schemes> updatedScheme) {
-        if (mySelectedList.contains(myCurrentBrand) && updatedScheme != null) {
-            mySelectedList.remove(myCurrentBrand);
-            myCurrentBrand.setMySelectedSchemesList(updatedScheme);
-            mySelectedList.add(myCurrentBrand);
+    private boolean checkIsMyBrandAdded(Brands selectedBrand) {
+        if (mySelectedList != null && selectedBrand != null) {
+            for (int i = 0; i < mySelectedList.size(); i++) {
+                if (mySelectedList.get(i).getBrandId().equals(selectedBrand.getBrandId())) {
+                    return true;
+                }
+            }
+            return false;
         }
+        return false;
+    }
+
+    public void updateBrand(List<Schemes> updatedScheme, String brandId) {
+
+        if (mySelectedList != null && checkIsMyBrandAdded(myCurrentBrand) && updatedScheme != null) {
+            int pos = getPosition(brandId);
+            List<Schemes> myCurrentSChemes = mySelectedList.get(pos).getMySelectedSchemesList();
+            myCurrentBrand.setMySelectedSchemesList(updatedScheme);
+            // TODO postition
+            int size = updatedScheme.size();
+            for (int i = 0; i < size; i++) {
+                if (!myCurrentSChemes.contains(updatedScheme.get(i)))
+                    myCurrentSChemes.add(updatedScheme.get(i));
+            }
+            myCurrentBrand.setMySelectedSchemesList(myCurrentSChemes);
+            mySelectedList.get(pos).setMySelectedSchemesList(myCurrentSChemes);
+        }
+    }
+
+    private int getPosition(String brandId) {
+        if (mySelectedList != null) {
+            for (int i = 0; i < mySelectedList.size(); i++) {
+                if (brandId.equals(mySelectedList.get(i).getBrandId()))
+                    return i;
+            }
+        }
+        return 0;
     }
 
     public Brands getCurrentBrand() {

@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
 
 import calc.mydukan.com.calculatortool.Helper.MySelectedSchemesHelper;
@@ -46,6 +47,8 @@ public class SchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         Schemes scheme = schemeList.get(position);
 
         schemeViewHolder.txtTitle.setText(scheme.getSchemeName());
+        schemeViewHolder.chkScheme.setOnCheckedChangeListener(null);
+        schemeViewHolder.chkScheme.setChecked(scheme.isSelected());
         schemeViewHolder.chkScheme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -70,17 +73,20 @@ public class SchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void notifyDataSetChanged(List<Schemes> mSchemesList, String brandId) {
 
         if (brandId != null && MySelectedSchemesHelper
-                .getInstance().getMyCurrentBrand(brandId) != null) {
+                .getInstance().getMyCurrentBrand(brandId) != null &&  MySelectedSchemesHelper
+                .getInstance().getMyCurrentBrand(brandId).getMySelectedSchemesList() !=null) {
             List<Schemes> selectedSchemes = MySelectedSchemesHelper
                     .getInstance().getMyCurrentBrand(brandId).getMySelectedSchemesList();
+
             for (int i = 0; i < selectedSchemes.size(); i++) {
-                if (mSchemesList.contains(selectedSchemes.get(i))){
-                  //  mSchemesList.
+                for(int j=0;j <mSchemesList.size();j++){
+                    if(selectedSchemes.get(i).getSchemeId().equals(mSchemesList.get(j).getSchemeId())){
+                        mSchemesList.remove(j);
+                        mSchemesList.add(selectedSchemes.get(i));
+                    }
                 }
             }
         }
-
-
         SchemeHelper.getInstance().updateList(mSchemesList);
         this.schemeList = mSchemesList;
         notifyDataSetChanged();

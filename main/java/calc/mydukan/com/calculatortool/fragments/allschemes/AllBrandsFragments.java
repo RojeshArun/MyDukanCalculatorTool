@@ -2,6 +2,7 @@ package calc.mydukan.com.calculatortool.fragments.allschemes;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.data.DataBuffer;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -23,6 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import calc.mydukan.com.calculatortool.Helper.MySelectedSchemesHelper;
 import calc.mydukan.com.calculatortool.MainActivity;
@@ -162,31 +166,54 @@ public class AllBrandsFragments extends Fragment implements
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
-                AddToMySchemes();
+                mActivity.showProgressBar();
+                UpdateMySchemes();
+
                 break;
         }
 
     }
 
-    private void AddToMySchemes() {
+    private void UpdateMySchemes() {
+
+        //TODO
+        DatabaseReference removeUserRef = FirebaseDatabase.getInstance()
+                .getReferenceFromUrl("https://otsystem-64e61.firebaseio.com/MySchemes/");
+
+        // Get Latest List
+        // Remove Old List
+        // Update it
         if (MySelectedSchemesHelper.getInstance().getList() != null && MySelectedSchemesHelper.getInstance().getList().size() > 0) {
-            MySelectedModel selectedModel = new MySelectedModel(FireBaseUtils.getUid(), MySelectedSchemesHelper.getInstance().getList());
-            mySchemesRef.setValue(selectedModel)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(mActivity, "Success", Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(mActivity, "Failed to add", Toast.LENGTH_SHORT).show();
-                }
-            });
+            final MySelectedModel selectedModel = new MySelectedModel(FireBaseUtils.getUid(), MySelectedSchemesHelper.getInstance().getList());
+            mySchemesRef.removeValue();
+            AddToMySchemes(selectedModel);
         } else {
             Toast.makeText(mActivity, "Please add schemes", Toast.LENGTH_SHORT).show();
         }
 
+
+    }
+
+    private void AddToMySchemes(MySelectedModel selectedModel) {
+
+        mySchemesRef.setValue(selectedModel)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(mActivity, "Success", Toast.LENGTH_SHORT).show();
+                        if (mActivity != null) {
+                            mActivity.hideProgressBar();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(mActivity, "Failed to add", Toast.LENGTH_SHORT).show();
+                if (mActivity != null) {
+                    mActivity.hideProgressBar();
+                }
+            }
+        });
     }
 
 

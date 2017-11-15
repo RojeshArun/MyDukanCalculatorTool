@@ -44,6 +44,7 @@ public class SchemesListingFragment extends Fragment
     private SchemesAdapter mAdapter;
     private List<Schemes> mSchemesList;
     private String brandId;
+    private int brandPos =0;
     ValueEventListener brandsListener;
 
 
@@ -51,6 +52,7 @@ public class SchemesListingFragment extends Fragment
 
         Bundle args = new Bundle();
         args.putString("brand_id", brandId);
+     //   args.putInt("pos",pos);
         SchemesListingFragment fragment = new SchemesListingFragment();
         fragment.setArguments(args);
         return fragment;
@@ -69,6 +71,8 @@ public class SchemesListingFragment extends Fragment
         mActivity.showProgressBar();
         if (getArguments() != null) {
             brandId = getArguments().getString("brand_id");
+        //    brandPos = getArguments().getInt("pos");
+
         }
         brandsRef = FirebaseDatabase.getInstance().getReference("schemes").child(brandId);
     }
@@ -144,16 +148,17 @@ public class SchemesListingFragment extends Fragment
         }
     }
 
-    private void saveMySelectedSchemes() {
+    private void saveMySelectedSchemes(int pos) {
 
         List<Schemes> updatedScheme = SchemeHelper.getInstance().getMySelectedList();
-        MySelectedSchemesHelper.getInstance().updateBrand(updatedScheme);
+        MySelectedSchemesHelper.getInstance().updateBrand(updatedScheme,brandId);
 
     }
 
+
     @Override
     public void onItemClick(int pos) {
-        saveMySelectedSchemes();
+        saveMySelectedSchemes(brandPos);
     }
 
 }

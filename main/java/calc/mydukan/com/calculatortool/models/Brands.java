@@ -1,6 +1,7 @@
 package calc.mydukan.com.calculatortool.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,6 +15,9 @@ public class Brands implements Serializable {
     String brandImageUrl;
 
     public List<Schemes> getMySelectedSchemesList() {
+        if(mySelectedSchemesList == null){
+            mySelectedSchemesList = new ArrayList<>();
+        }
         return mySelectedSchemesList;
     }
 

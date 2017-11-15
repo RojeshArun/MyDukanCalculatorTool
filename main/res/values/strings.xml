@@ -25,6 +25,7 @@
     <string name="select_offers_for_the_period">Change Date</string>
     <string name="share">Share</string>
     <string name="email">Email</string>
+    <string name="action_search">Add</string>
 
     <array name="months">
         <item>-Select Month-</item>
