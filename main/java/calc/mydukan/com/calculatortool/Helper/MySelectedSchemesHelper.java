@@ -32,6 +32,14 @@ public class MySelectedSchemesHelper {
         return mySelectedList;
     }
 
+    public Brands getMyCurrentBrand(String brandId) {
+        for (int i = 0; i < mySelectedList.size(); i++) {
+            if (mySelectedList.get(i).getBrandId().equalsIgnoreCase(brandId))
+                return mySelectedList.get(i);
+        }
+        return null;
+    }
+
     public void addBrand(Brands selectedBrand) {
         if (!mySelectedList.contains(selectedBrand)) {
             myCurrentBrand = selectedBrand;
@@ -54,5 +62,9 @@ public class MySelectedSchemesHelper {
     public void reset() {
         mySelectedList = new ArrayList<>();
         myCurrentBrand = null;
+    }
+
+    public void setList(List<Brands> mySelectedList) {
+        this.mySelectedList = mySelectedList;
     }
 }

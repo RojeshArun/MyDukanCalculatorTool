@@ -11,9 +11,11 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import calc.mydukan.com.calculatortool.Helper.MySelectedSchemesHelper;
 import calc.mydukan.com.calculatortool.Helper.SchemeHelper;
 import calc.mydukan.com.calculatortool.R;
 import calc.mydukan.com.calculatortool.fragments.allschemes.adapter.MySchemesAdapter;
+import calc.mydukan.com.calculatortool.models.Brands;
 import calc.mydukan.com.calculatortool.models.Schemes;
 
 /**
@@ -65,7 +67,20 @@ public class SchemesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return schemeList.size();
     }
 
-    public void notifyDataSetChanged(List<Schemes> mSchemesList) {
+    public void notifyDataSetChanged(List<Schemes> mSchemesList, String brandId) {
+
+        if (brandId != null && MySelectedSchemesHelper
+                .getInstance().getMyCurrentBrand(brandId) != null) {
+            List<Schemes> selectedSchemes = MySelectedSchemesHelper
+                    .getInstance().getMyCurrentBrand(brandId).getMySelectedSchemesList();
+            for (int i = 0; i < selectedSchemes.size(); i++) {
+                if (mSchemesList.contains(selectedSchemes.get(i))){
+                  //  mSchemesList.
+                }
+            }
+        }
+
+
         SchemeHelper.getInstance().updateList(mSchemesList);
         this.schemeList = mSchemesList;
         notifyDataSetChanged();

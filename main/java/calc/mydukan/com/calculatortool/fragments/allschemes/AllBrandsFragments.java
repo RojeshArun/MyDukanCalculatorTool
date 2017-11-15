@@ -103,6 +103,21 @@ public class AllBrandsFragments extends Fragment implements
                 }
             }
         });
+
+        mySchemesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    MySelectedModel mySelectedModel = dataSnapshot.getValue(MySelectedModel.class);
+                    MySelectedSchemesHelper.getInstance().setList(mySelectedModel.getMySelectedSchemes());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Nullable

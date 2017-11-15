@@ -89,7 +89,7 @@ public class SchemesListingFragment extends Fragment
                     mSchemesList.add(brandItem);
                 }
                 if (mAdapter != null) {
-                    mAdapter.notifyDataSetChanged(mSchemesList);
+                    mAdapter.notifyDataSetChanged(mSchemesList,brandId);
                 }
                 mActivity.hideProgressBar();
 
@@ -122,7 +122,7 @@ public class SchemesListingFragment extends Fragment
                 new GridSpacingItemDecoration(2, Utils.dpToPx(getActivity(), 10), true));
         mBrandsRecycleView.setAdapter(mAdapter);
         if (mSchemesList != null) {
-            mAdapter.notifyDataSetChanged(mSchemesList);
+            mAdapter.notifyDataSetChanged(mSchemesList,"");
         }
     }
 
